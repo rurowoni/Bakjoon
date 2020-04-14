@@ -24,6 +24,32 @@ void labeling(int sy, int sx){
     }
 }
 
+void make_bridge(int sy, int sx){
+    int cur_nat = map[sy][sx];
+    queue<pair<int, int>> q;
+    q.push({sy,sx});
+    visited[sy][sx] = 1;
+    while(!q.empty()){
+        int cy = q.front().first;
+        int cx = q.front().second;
+        q.pop();
+        for(int dir = 0; dir < 4; dir++){
+            int ny = cy + dy[dir];
+            int nx = cx + dx[dir];
+            if(ny < 0 || ny >= n || nx < 0 || nx >= n) continue;
+            if(!visited[ny][nx] && !map[ny][nx]){
+                visited[ny][nx] = visited[cy][cx] + 1;
+                q.push({ny, nx});
+            }
+            else if(map[ny][nx] && map[ny][nx] != cur_nat){
+                ret = min(ret, visited[cy][cx]);
+                break;
+            }
+        }
+    }
+    
+}
+
 int main(){
     cin >> n;
     for(int y = 0; y < n; y++){
@@ -46,28 +72,7 @@ int main(){
         for(int x = 0; x < n; x++){
             if(map[y][x]){
                 memset(visited, 0, sizeof(visited));
-                int cur_nat = map[y][x];
-                queue<pair<int, int>> q;
-                q.push({y,x});
-                visited[y][x] = 1;
-                while(!q.empty()){
-                    int cy = q.front().first;
-                    int cx = q.front().second;
-                    q.pop();
-                    for(int dir = 0; dir < 4; dir++){
-                        int ny = cy + dy[dir];
-                        int nx = cx + dx[dir];
-                        if(ny < 0 || ny >= n || nx < 0 || nx >= n) continue;
-                        if(!visited[ny][nx] && !map[ny][nx]){
-                            visited[ny][nx] = visited[cy][cx] + 1;
-                            q.push({ny, nx});
-                        }
-                        else if(map[ny][nx] && map[ny][nx] != cur_nat){
-                            ret = min(ret, visited[cy][cx]);
-                            break;
-                        }
-                    }
-                }
+                make_bridge(y, x);
             }
         }
     }
