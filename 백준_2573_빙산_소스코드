@@ -1,0 +1,70 @@
+#include <iostream>
+#include <cstring>
+
+using namespace std;
+
+int n, m, year, iceberg, cur;
+int map[2][300][300];
+const int dy[] = {-1, 1, 0, 0};
+const int dx[] = {0, 0, -1, 1};
+int visited[300][300];
+
+void DFS(int sy, int sx){
+    visited[sy][sx] = iceberg;
+    for(int dir = 0; dir < 4; dir++){
+        int ny = sy + dy[dir];
+        int nx = sx + dx[dir];
+        if(ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
+        if(!visited[ny][nx] && map[cur][ny][nx]){
+            DFS(ny, nx);
+        }
+    }
+}
+
+int main(){
+    cin >> n >> m;
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < m; x++){
+            cin >> map[cur][y][x];
+        }
+    }
+    
+    iceberg = 1;
+    while(iceberg < 2 && iceberg > 0){
+        int next = (cur + 1) % 2;
+        for(int y = 0; y < n; y++){
+            for(int x = 0; x < m; x++){
+                if(!map[cur][y][x]){
+                    map[next][y][x] = 0;
+                }
+                else{
+                    int cnt = 0;
+                    for(int dir = 0; dir < 4; dir++){
+                        int ny = y + dy[dir];
+                        int nx = x + dx[dir];
+                        if(ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
+                        if(!map[cur][ny][nx]){
+                            ++cnt;
+                        }
+                    }
+                    if(map[cur][y][x] < cnt) map[next][y][x] = 0;
+                    else map[next][y][x] = map[cur][y][x] - cnt;
+                }
+            }
+        }
+        cur = next;
+        iceberg = 0;
+        memset(visited, 0, sizeof(visited));
+        for(int y = 0; y < n; y++){
+            for(int x = 0; x < m; x++){
+                if(!visited[y][x] && map[cur][y][x]){
+                    ++iceberg;
+                    DFS(y, x);
+                }
+            }
+        }
+        ++year;
+    }
+    if(iceberg == 0) cout << 0 << endl;
+    else cout << year << endl;
+}
