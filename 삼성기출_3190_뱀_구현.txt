@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <queue>
+
+using namespace std;
+
+int N, K, L, hy, hx, dir, ret;
+int map[100][100];
+int dy[] = {-1, 0, 1, 0};
+int dx[] = {0, 1, 0, -1};
+struct DIRECTION{
+    int x;
+    char c;
+};
+DIRECTION direction[100];
+
+int main(){
+    scanf("%d %d", &N, &K);
+    for(int i = 0; i < K; i++){
+        int y, x;
+        scanf("%d %d", &y, &x);
+        map[y - 1][x - 1] = 2;
+    }
+    
+    scanf("%d", &L);
+    for(int i = 0; i < L; i++){
+        scanf("%d %c", &direction[i].x, &direction[i].c);
+    }
+    
+    map[hy][hx] = 1;
+    dir = 1;
+    queue<pair<int, int>> snake;
+    snake.push({hy, hx});
+        
+    int i = 0;
+    while(1){
+        ++ret;
+        hy += dy[dir];
+        hx += dx[dir];
+        if(hy < 0 || hy >= N || hx < 0 || hx >= N || map[hy][hx] == 1){
+            break;
+        }
+        if(map[hy][hx] == 0){
+            int tail_y = snake.front().first;
+            int tail_x = snake.front().second;
+            snake.pop();
+            map[tail_y][tail_x] = 0;
+        }
+        map[hy][hx] = 1;
+        snake.push({hy,hx});
+        if(ret == direction[i].x) {
+            if(direction[i].c == 'L')
+                dir = (dir + 3) % 4;
+            else dir = (dir + 1) % 4;
+            i++;
+        };
+    }
+    printf("%d\n", ret);
+}
