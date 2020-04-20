@@ -1,0 +1,80 @@
+#include <stdio.h>
+
+int n, m, dice_y, dice_x, k;
+int map[20][20];
+int dice[6];
+int cmd[1000];
+int dy[] = {0, 0, -1, 1};
+int dx[] = {1, -1, 0, 0};
+
+void move(int dir){
+    int temp[6];
+    dice_y += dy[dir];
+    dice_x += dx[dir];
+    if(dice_y < 0 || dice_y >= n || dice_x < 0 || dice_x >= m) {
+        dice_y -= dy[dir];
+        dice_x -= dx[dir];
+        return;
+    }
+    if(dir == 0){
+        temp[0] = dice[3];
+        temp[1] = dice[1];
+        temp[2] = dice[0];
+        temp[3] = dice[5];
+        temp[4] = dice[4];
+        temp[5] = dice[2];
+    }
+    else if(dir == 1){
+        temp[0] = dice[2];
+        temp[1] = dice[1];
+        temp[2] = dice[5];
+        temp[3] = dice[0];
+        temp[4] = dice[4];
+        temp[5] = dice[3];
+    }
+    else if(dir == 2){
+        temp[0] = dice[4];
+        temp[1] = dice[0];
+        temp[2] = dice[2];
+        temp[3] = dice[3];
+        temp[4] = dice[5];
+        temp[5] = dice[1];
+    }
+    else if(dir == 3){
+        temp[0] = dice[1];
+        temp[1] = dice[5];
+        temp[2] = dice[2];
+        temp[3] = dice[3];
+        temp[4] = dice[0];
+        temp[5] = dice[4];
+    }
+    if(map[dice_y][dice_x] == 0){
+        map[dice_y][dice_x] = temp[5];
+    }
+    else{
+        temp[5] = map[dice_y][dice_x];
+        map[dice_y][dice_x] = 0;
+    }
+    for(int i = 0; i < 6; i++){
+        dice[i] = temp[i];
+    }
+    printf("%d\n", dice[0]);
+}
+
+
+int main(){
+    scanf("%d %d %d %d %d", &n, &m, &dice_y, &dice_x, &k);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < m; x++){
+            scanf("%d", &map[y][x]);
+        }
+    }
+    for(int i = 0; i < k; i++){
+        scanf("%d", &cmd[i]);
+        --cmd[i];
+    }
+    
+    for(int i = 0; i < k; i++){
+        move(cmd[i]);
+    }
+}
