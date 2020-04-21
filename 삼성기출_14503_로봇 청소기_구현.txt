@@ -1,0 +1,51 @@
+#include <stdio.h>
+
+int n, m, ret;
+int ry, rx, dir;
+int map[50][50];
+int dy[] = {-1, 0, 1, 0};
+int dx[] = {0, 1, 0, -1};
+
+int main(){
+    scanf("%d %d", &n, &m);
+    scanf("%d %d %d", &ry, &rx, &dir);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < m; x++){
+            scanf("%d", &map[y][x]);
+        }
+    }
+        
+    while(1){
+        if(map[ry][rx] == 0){  // 1. 현위치 청소
+            map[ry][rx] = 2;
+            ret++;
+            continue;
+        }
+        bool is_clean = true;
+        for(int i = 0; i < 4; i++){  // 2. 왼쪽부터 탐색
+            dir = (dir + 3) % 4;
+            int ny = ry + dy[dir];
+            int nx = rx + dx[dir];
+            if(map[ny][nx] == 0){  // a. 청소할 공간 발견!
+                ry = ny;
+                rx = nx;
+                is_clean = false;
+                break;
+            }
+            else  // b. 청소공간 x -> 2
+                continue;
+        }
+        if(is_clean){
+            int ny = ry - dy[dir];
+            int nx = rx - dx[dir];
+            if(map[ny][nx] != 1){
+                ry = ny;
+                rx = nx;
+            }
+            else{
+                break;
+            }
+        }
+    }
+    printf("%d\n", ret);
+}

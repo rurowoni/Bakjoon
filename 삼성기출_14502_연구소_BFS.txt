@@ -1,0 +1,82 @@
+#include <stdio.h>
+#include <queue>
+#include <algorithm>
+
+using namespace std;
+
+int n, m, ret;
+int map[8][8];
+struct POSI{
+    int y, x;
+};
+
+POSI safe[60];
+POSI virus[10];
+int num_safe, num_virus;
+int dy[] = {-1, 1, 0, 0};
+int dx[] = {0, 0, -1, 1};
+
+void BFS(int i, int j, int k){
+    int copy[8][8];
+    for(int y = 0; y < n; y++){  // copy map
+        for(int x = 0; x < m; x++){
+            copy[y][x] = map[y][x];
+        }
+    }
+    // make wall
+    copy[safe[i].y][safe[i].x] = 1;
+    copy[safe[j].y][safe[j].x] = 1;
+    copy[safe[k].y][safe[k].x] = 1;
+    
+    int visited[8][8] = {0, };
+    for(int i = 0; i < num_virus; i++){
+        queue<POSI> q;
+        q.push(virus[i]);
+        visited[virus[i].y][virus[i].x] = 1;
+        while(!q.empty()){
+            int cy = q.front().y;
+            int cx = q.front().x;
+            q.pop();
+            for(int dir = 0; dir < 4; dir++){
+                int ny = cy + dy[dir];
+                int nx = cx + dx[dir];
+                if(ny < 0 || ny >= n || nx < 0 || nx >= m) continue;
+                if(!visited[ny][nx] && copy[ny][nx] == 0){
+                    copy[ny][nx] = 2;
+                    visited[ny][nx] = 1;
+                    q.push({ny, nx});
+                }
+            }
+        }
+    }
+    int cnt = 0;
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < m; x++){
+            if(copy[y][x] == 0)
+                ++cnt;
+        }
+    }
+    ret = max(ret, cnt);
+}
+
+int main(){
+    scanf("%d %d", &n, &m);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < m; x++){
+            scanf("%d", &map[y][x]);
+            if(map[y][x] == 0)
+                safe[num_safe++] = {y, x};
+            else if(map[y][x] == 2)
+                virus[num_virus++] = {y, x};
+        }
+    }
+    
+    for(int i = 0; i < num_safe; i++){
+        for(int j = i + 1; j < num_safe; j++){
+            for(int k = j + 1; k < num_safe; k++){
+                BFS(i, j, k);
+            }
+        }
+    }
+    printf("%d\n", ret);
+}

@@ -1,0 +1,89 @@
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+
+int n, m;
+long long ret;
+int map[500][500];
+int dy[][3] = {{0, 0, 0},
+    {0, 1, 1},
+    {1, 2, 2},
+    {1, 1, 2},
+    {0, 0, 1},
+    {0, 1, 2},
+    {-1, 0, 1}
+};
+int dx[][3] = {{1, 2, 3},
+    {1, 0, 1},
+    {0, 0, 1},
+    {0, 1, 1},
+    {1, 2, 1},
+    {1, 0, 0},
+    {1, 1, 0}
+};
+
+int check_range(int y, int x){
+    if(y < 0 || y >= n || x < 0 || x >= m) return 1;
+    else return 0;
+}
+
+void rotate(){
+    int temp[500][500];
+    
+    for(int y = 0; y < m; y++){
+        for(int x = 0; x < n; x++){
+            temp[y][x] = map[n - 1 - x][y];
+        }
+    }
+    
+    int tmp = n;
+    n = m;
+    m = tmp;
+    
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < m; x++){
+            map[y][x] = temp[y][x];
+        }
+    }
+}
+
+void tetromino(){
+    for(int rot = 0; rot < 4; rot++){
+        for(int y = 0; y < n; y++){
+            for(int x = 0; x < m; x++){
+                for(int k = 0; k < 7; k++){
+                    long long sum = 0;
+                    sum += map[y][x];
+                    bool is_clear = true;
+                    for(int dir = 0; dir < 3; dir++){
+                        int ny = y + dy[k][dir];
+                        int nx = x + dx[k][dir];
+                        if(check_range(ny, nx)) {
+                            is_clear = false;
+                            break;
+                        }
+                        sum += map[ny][nx];
+                    }
+                    if(is_clear){
+                        ret = max(ret, sum);
+                    }
+                }
+            }
+        }
+        rotate();
+    }
+}
+
+int main(){
+    scanf("%d %d", &n, &m);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < m; x++){
+            scanf("%d", &map[y][x]);
+        }
+    }
+    
+    tetromino();
+    
+    printf("%lld\n", ret);
+}
