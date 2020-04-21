@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+
+int n, ret = 9999;
+int stat[20][20];
+int picked[20];
+
+void DFS(int index, int size){
+    if(size == n / 2){
+        int A[10], B[10];
+        int index_A = 0, index_B = 0;
+        int stat_A = 0, stat_B = 0;
+        for(int i = 0; i < n; i++){
+            if(picked[i] == 1){
+                A[index_A++] = i;
+            }
+            else{
+                B[index_B++] = i;
+            }
+        }
+
+        for(int i = 0; i < n / 2; i++){
+            for(int j = i + 1; j < n / 2; j++){
+                stat_A += stat[A[i]][A[j]];
+                stat_A += stat[A[j]][A[i]];
+            }
+        }
+        for(int i = 0; i < n / 2; i++){
+            for(int j = i + 1; j < n / 2; j++){
+                stat_B += stat[B[i]][B[j]];
+                stat_B += stat[B[j]][B[i]];
+            }
+        }
+        int diff = abs(stat_A - stat_B);
+        ret = min(ret, diff);
+        return;
+    }
+    
+    for(int i = index; i < n; i++){
+        picked[i] = 1;
+        DFS(i + 1, size + 1);
+        picked[i] = 0;
+    }
+}
+
+int main(){
+    scanf("%d", &n);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < n; x++){
+            scanf("%d", &stat[y][x]);
+        }
+    }
+    
+    DFS(0, 0);
+    
+    printf("%d\n", ret);
+}
+
