@@ -1,0 +1,66 @@
+#include <stdio.h>
+#include <math.h>
+
+int gear[4][9];
+int k, ret;
+
+void rotate(int n, int dir){
+    if(dir == 1){
+        for(int i = 7; i >= 0; i--){
+            gear[n][i + 1] = gear[n][i];
+        }
+        gear[n][0] = gear[n][8];
+    }
+    else if(dir == -1){
+        gear[n][8] = gear[n][0];
+        for(int i = 0; i < 8; i++){
+            gear[n][i] = gear[n][i + 1];
+        }
+    }
+}
+
+void move(int n, int dir_n){
+    int dir[4];
+    dir[n] = dir_n;
+    for(int i = n - 1; i >= 0; i--){
+        if(gear[i][2] != gear[i + 1][6]){
+            dir[i] = -1 * dir[i + 1];
+        }
+        else{
+            dir[i] = 0;
+        }
+    }
+    for(int i = n + 1; i < 4; i++){
+        if(gear[i][6] != gear[i - 1][2]){
+            dir[i] = -1 * dir[i - 1];
+        }
+        else{
+            dir[i] = 0;
+        }
+    }
+    for(int i = 0; i < 4; i++){
+        rotate(i, dir[i]);
+    }
+}
+int main(){
+    for(int i = 0; i < 4; i++){
+        for(int j = 0; j < 8; j++){
+            scanf("%1d", &gear[i][j]);
+        }
+    }
+
+    scanf("%d", &k);
+    for(int i = 0; i < k; i++){
+        int n, dir;
+        scanf("%d %d", &n, &dir);
+        move(n - 1, dir);
+    }
+    
+    for(int i = 0; i < 4; i++){
+        if(gear[i][0] == 1){
+            ret += pow(2, i);
+        }
+    }
+    
+    printf("%d\n", ret);
+}
