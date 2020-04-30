@@ -1,0 +1,77 @@
+#include <stdio.h>
+#include <cstring>
+#include <algorithm>
+
+using namespace std;
+
+int r, c, k, n = 3, m = 3, ret;
+int data[2][101][101];
+int cnt[101];
+
+void row(int cur){
+    int next = (cur + 1) % 2;
+    memset(data[next], 0, sizeof(data[next]));
+    int new_m = 0;
+    for(int y = 1; y <= n; y++){
+        memset(cnt, 0, sizeof(cnt));
+        for(int x = 1; x <= m; x++){
+            cnt[data[cur][y][x]]++;
+        }
+        int col_cnt = 0;
+        for(int i = 1; i <= 100 && col_cnt < 100; i++){  // 등장 횟수
+            for(int j = 1; j <= 100 && col_cnt < 100; j++){  // 등장 숫자
+                if(cnt[j] == i){
+                    data[next][y][++col_cnt] = j;
+                    data[next][y][++col_cnt] = i;
+                }
+            }
+        }
+        new_m = max(new_m, col_cnt);
+    }
+    m = new_m;
+}
+
+void col(int cur){
+    int next = (cur + 1) % 2;
+    memset(data[next], 0, sizeof(data[next]));
+    int new_n = 0;
+    for(int x = 1; x <= m; x++){
+        memset(cnt, 0, sizeof(cnt));
+        for(int y = 1; y <= n; y++){
+            cnt[data[cur][y][x]]++;
+        }
+        int row_cnt = 0;
+        for(int i = 1; i <= 100 && row_cnt < 100; i++){
+            for(int j = 1; j <= 100 && row_cnt < 100; j++){
+                if(cnt[j] == i){
+                    data[next][++row_cnt][x] = j;
+                    data[next][++row_cnt][x] = i;
+                }
+            }
+        }
+        new_n = max(new_n, row_cnt);
+    }
+    n = new_n;
+}
+
+int main(){
+    scanf("%d %d %d", &r, &c, &k);
+    for(int y = 1; y <= n; y++){
+        for(int x = 1; x <= m; x++){
+            scanf("%d", &data[0][y][x]);
+        }
+    }
+    int cur = 0;
+    while(data[cur][r][c] != k && ret <= 100){
+        if(n >= m){
+            row(cur);
+        }
+        else{
+            col(cur);
+        }
+        ret++;
+        cur = (cur + 1) % 2;
+    }
+    if(ret > 100) printf("-1\n");
+    else printf("%d\n", ret);
+}

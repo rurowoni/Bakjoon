@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <algorithm>
+
+int n, m, ret = 9999;
+int map[50][50];
+
+struct POSI{
+    int y, x;
+};
+int chicken_size;
+int house_size;
+
+POSI chicken[13];
+POSI house[100];
+int pick[13];
+void chicken_delivery(int index, int size){
+    if(size == m){
+        int sum = 0;
+        for(int i = 0; i < house_size; i++){
+            int hy = house[i].y;
+            int hx = house[i].x;
+            int candi = 9999;
+            for(int j = 0; j < m; j++){
+                int cy = chicken[pick[j]].y;
+                int cx = chicken[pick[j]].x;
+                int dist = abs(hy - cy) + abs(hx - cx);
+                if(dist < candi) candi = dist;
+            }
+            sum += candi;
+        }
+        if(sum < ret) ret = sum;
+        return;
+    }
+    
+    for(int i = index; i < chicken_size; i++){
+        pick[size] = i;
+        chicken_delivery(i + 1, size + 1);
+        pick[size] = NULL;
+    }
+}
+
+int main(){
+    scanf("%d %d", &n, &m);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < n; x++){
+            scanf("%d", &map[y][x]);
+            if(map[y][x] == 2){
+                chicken[chicken_size++] = {y, x};
+            }
+            else if(map[y][x] == 1){
+                house[house_size++] = {y, x};
+            }
+        }
+    }
+    
+    chicken_delivery(0, 0);
+    printf("%d\n", ret);
+}

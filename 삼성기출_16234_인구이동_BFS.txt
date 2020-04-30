@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <queue>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+int N, L, R, ret;
+int map[50][50];
+int dy[] = {-1, 1, 0, 0};
+int dx[] = {0, 0, -1, 1};
+
+int main(){
+    scanf("%d %d %d", &N, &L, &R);
+    for(int y = 0; y < N; y++){
+        for(int x = 0; x < N; x++){
+            scanf("%d", &map[y][x]);
+        }
+    }
+    bool is_update = true;
+    while(is_update){
+        is_update = false;
+        bool visited[50][50] = {0,};
+        for(int y = 0; y < N; y++){
+            for(int x = 0; x < N; x++){
+                if(visited[y][x] == 0){
+                    vector<pair<int, int>> v;
+                    queue<pair<int, int>> q;
+                    int sum = 0;
+                    q.push({y, x});
+                    visited[y][x] = true;
+                    while(!q.empty()){
+                        int cy = q.front().first;
+                        int cx = q.front().second;
+                        q.pop();
+                        v.push_back({cy, cx});
+                        sum += map[cy][cx];
+                        for(int dir = 0; dir < 4; dir++){
+                            int ny = cy + dy[dir];
+                            int nx = cx + dx[dir];
+                            if(ny < 0 || ny >= N || nx < 0 || nx >= N || visited[ny][nx]) continue;
+                            int diff = abs(map[ny][nx] - map[cy][cx]);
+                            if(L <= diff && diff <= R){
+                                is_update = true;
+                                visited[ny][nx] = true;
+                                q.push({ny, nx});
+                            }
+                        }
+                    }
+                    for(int i = 0; i < v.size(); i++){
+                        map[v[i].first][v[i].second] = sum / v.size();
+                    }
+                }
+            }
+        }
+        if(is_update) ret++;
+    }
+    
+    printf("%d\n", ret);
+}

@@ -1,0 +1,95 @@
+#include <stdio.h>
+#include <cstring>
+
+int r, c, t, ret, up, down, idx;
+int map[2][50][50];
+int dy[] = {-1, 1, 0, 0};
+int dx[] = {0, 0, -1, 1};
+
+void diffusion(){
+    int next = (idx + 1) % 2;
+    memset(map[next], 0, sizeof(map[next]));
+    for(int y = 0; y < r; y++){
+        for(int x = 0; x < c; x++){
+            if(map[idx][y][x] > 0){
+                int cnt = 0;
+                for(int dir = 0; dir < 4; dir++){
+                    int ny = y + dy[dir];
+                    int nx = x + dx[dir];
+                    if(ny < 0 || ny >= r || nx < 0 || nx >= c) continue;
+                    if(map[idx][ny][nx] != -1){
+                        map[next][ny][nx] += (map[idx][y][x] / 5);
+                        cnt++;
+                    }
+                }
+                map[next][y][x] += (map[idx][y][x] - (map[idx][y][x] / 5) * cnt);
+            }
+            else if(map[idx][y][x] == -1){
+                map[next][y][x] = -1;
+            }
+        }
+    }
+    idx = next;
+}
+
+void cleaning(){
+    // upper air cleaner
+    for(int y = up - 1; y > 0; y--)
+        map[idx][y][0] = map[idx][y - 1][0];
+    
+    for(int x = 0; x < c - 1; x++)
+        map[idx][0][x] = map[idx][0][x + 1];
+    
+    for(int y = 0; y < up; y++)
+        map[idx][y][c - 1] = map[idx][y + 1][c - 1];
+    
+    for(int x = c - 1; x > 1; x--)
+        map[idx][up][x] = map[idx][up][x - 1];
+    
+    map[idx][up][1] = 0;
+    
+    // lower air cleaner
+    for(int y = down + 1; y < r - 1; y++)
+        map[idx][y][0] = map[idx][y + 1][0];
+    
+    for(int x = 0; x < c - 1; x++)
+        map[idx][r - 1][x] = map[idx][r - 1][x + 1];
+    
+    for(int y = r - 1; y > down; y--)
+        map[idx][y][c - 1] = map[idx][y - 1][c - 1];
+    
+    for(int x = c - 1; x > 1; x--)
+        map[idx][down][x] = map[idx][down][x - 1];
+    
+    map[idx][down][1] = 0;
+}
+
+int main(){
+    scanf("%d %d %d", &r, &c, &t);
+    int ac = 0;
+    for(int y = 0 ; y < r; y++){
+        for(int x = 0; x < c; x++){
+            scanf("%d", &map[0][y][x]);
+            if(map[0][y][x] == -1){
+                if(ac == 0){
+                    up = y;
+                    ac++;
+                }
+                else down = y;
+            }
+        }
+    }
+    
+    for(int i= 0; i < t; i++){
+        diffusion();
+        cleaning();
+    }
+    
+    for(int y = 0; y < r; y++){
+        for(int x = 0; x < c; x++){
+            if(map[idx][y][x] > 0) ret += map[idx][y][x];
+        }
+    }
+    
+    printf("%d\n", ret);
+}
