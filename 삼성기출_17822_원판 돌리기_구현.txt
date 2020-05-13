@@ -1,0 +1,101 @@
+#include <stdio.h>
+#include <vector>
+
+using namespace std;
+
+int n, m, t;
+int map[51][101];
+int di[] = {-1, 0, 1, 0};
+int dj[] = {0, -1, 0, 1};
+
+struct POSI{
+    int i, j;
+};
+
+
+void rotate(int x, int d, int k){
+    for(int i = x; i <= n; i += x){
+        if(d == 0){
+            for(int j = m; j >= 1; j--){
+                map[i][j + k] = map[i][j];
+            }
+            for(int j = m + 1; j <= m + k; j++){
+                map[i][j - m] = map[i][j];
+            }
+        }
+        else{
+            for(int j = 1; j <= k; j++){
+                map[i][m + j] = map[i][j];
+            }
+            for(int j = k + 1; j <= m; j++){
+                map[i][j - k] = map[i][j];
+            }
+            for(int j = m + 1; j <= m + k; j++){
+                map[i][j - k] = map[i][j];
+            }
+        }
+    }
+    
+    
+    vector<POSI> v;
+    int sum = 0;
+    int cnt = 0;
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= m; j++){
+            if(map[i][j]){
+                sum += map[i][j];
+                cnt++;
+                for(int dir = 0; dir < 4; dir++){
+                    int ni = i + di[dir];
+                    int nj = j + dj[dir];
+                    if(ni < 1 || ni > n) continue;
+                    if(nj < 1) nj = m;
+                    if(nj > m) nj = 1;
+                    if(map[i][j] == map[ni][nj]){
+                        v.push_back({ni, nj});
+                    }
+                }
+            }
+        }
+    }
+    if(cnt > 0){
+        if(!v.empty()){
+            for(int i = 0; i < v.size(); i++){
+                map[v[i].i][v[i].j] = 0;
+            }
+        }
+        else{
+            double avg = (double)sum / cnt;
+            for(int i = 1; i <= n; i++){
+                for(int j = 1; j <= m; j++){
+                    if(map[i][j]){
+                        if(map[i][j] > avg) map[i][j]--;
+                        else if(map[i][j] < avg) map[i][j]++;
+                    }
+                }
+            }
+        }
+    }
+}
+
+int main(){
+    scanf("%d %d %d", &n, &m, &t);
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= m; j++){
+            scanf("%d", &map[i][j]);
+        }
+    }
+    for(int i = 0; i < t; i++){
+        int x, d, k;
+        scanf("%d %d %d", &x, &d, &k);
+        rotate(x, d, k);
+    }
+    
+    int ret = 0;
+    for(int i = 1; i <= n; i++){
+        for(int j = 1; j <= m; j++){
+            ret += map[i][j];
+        }
+    }
+    printf("%d\n", ret);
+}

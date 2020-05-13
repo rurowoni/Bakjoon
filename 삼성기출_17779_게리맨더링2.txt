@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <algorithm>
+
+using namespace std;
+
+int n, r, c, d1, d2, ret, tot;
+int map[20][20];
+
+void section(){
+    // 1번 선거구 계산
+    int sect[5] = {0,};
+    for(int y = 0; y < r; y++){
+        for(int x = 0; x <= c; x++){
+            sect[0] += map[y][x];
+        }
+    }
+    for(int y = r; y < r + d1; y++){
+        for(int x = 0; x < c - (y - r); x++){
+            sect[0] += map[y][x];
+        }
+    }
+    // 2번 선거구 계산
+    for(int y = 0; y < r; y++){
+        for(int x = c + 1; x < n; x++){
+            sect[1] += map[y][x];
+        }
+    }
+    for(int y = r; y <= r + d2; y++){
+        for(int x = c + 1 + (y - r); x < n; x++)
+            sect[1] += map[y][x];
+    }
+    // 3번 선거구 계산
+    for(int y = r + d1; y <= r + d1 + d2; y++){
+        for(int x = 0; x < c - d1 + (y - r - d1); x++){
+            sect[2] += map[y][x];
+        }
+    }
+    for(int y = r + d1 + d2 + 1; y < n; y++){
+        for(int x = 0; x < c - d1 + d2; x++){
+            sect[2] += map[y][x];
+        }
+    }
+    // 4번 선거구 계산
+    for(int y = r + d2 + 1; y <= r + d1 + d2; y++){
+        for(int x = c + d2 - (y - r - d2 - 1); x < n; x++){
+            sect[3] += map[y][x];
+        }
+    }
+    for(int y = r + d1 + d2 + 1; y < n; y++){
+        for(int x = c - d1 + d2; x < n; x++){
+            sect[3] += map[y][x];
+        }
+    }
+    // 5번 선거구 계산
+    // 전체 - (1~4);
+    sect[4] = tot - sect[0] - sect[1] - sect[2] - sect[3];
+    sort(sect, sect + 5);
+    ret = min(ret, sect[4] - sect[0]);
+}
+
+void solve(){
+    for(r = 0; r < n - 2; r++){
+        for(c = 1; c < n - 1; c++){
+            for(d1 = 1; r + d1 + 1 <= n - 1 && d1 <= c; d1++){
+                for(d2 = 1; r + d1 + d2 <= n - 1 && d2 <= n - 1 - c; d2++){
+                    section();
+                }
+            }
+        }
+    }
+}
+
+int main(){
+    scanf("%d", &n);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < n; x++){
+            scanf("%d", &map[y][x]);
+            tot += map[y][x];
+        }
+    }
+    
+    ret = 40000;
+    solve();
+    printf("%d\n", ret);
+}
+
+   

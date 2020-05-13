@@ -1,0 +1,94 @@
+#include <stdio.h>
+#include <queue>
+#include <vector>
+
+using namespace std;
+
+int n, m, cnt_empty, ret = 9999;
+int map[50][50];
+struct POSI{
+    int y, x;
+};
+vector<POSI> virus, pick;
+int dy[] = {-1, 0, 1, 0};
+int dx[] = {0, -1, 0, 1};
+
+void bfs(){
+    bool visited[50][50] = {0, };
+    int copy[50][50];
+    
+    for(int y = 0; y < n; y++){  //
+        for(int x = 0; x < n; x++){
+            copy[y][x] = map[y][x];
+        }
+    }
+    
+    queue<POSI> q;
+    for(int i = 0; i < pick.size(); i++){
+        POSI cur = pick[i];
+        copy[cur.y][cur.x] = 3;
+        visited[cur.y][cur.x] = 1;
+        q.push(cur);
+    }
+    int cnt = cnt_empty;
+    int t = 0;
+    while(!q.empty() && cnt > 0){
+        int size = (int)q.size();
+        for(int i = 0; i < size; i++){
+            POSI cur = q.front();
+            q.pop();
+            for(int dir = 0; dir < 4; dir++){
+                int ny = cur.y + dy[dir];
+                int nx = cur.x + dx[dir];
+                if(ny < 0 || ny >= n || nx < 0 || nx >= n) continue;
+                if(!visited[ny][nx] && copy[ny][nx] == 0){
+                    visited[ny][nx] = 1;
+                    cnt--;
+                    q.push({ny, nx});
+                }
+                else if(!visited[ny][nx] && copy[ny][nx] == 2){
+                    visited[ny][nx] = 1;
+                    q.push({ny, nx});
+                }
+            }
+        }
+        t++;
+    }
+    
+    if(cnt == 0 && ret > t) ret = t;
+  
+    return;
+}
+
+void dfs_pick(int index){
+    if(pick.size() == m){
+        bfs();
+        return;
+    }
+        
+    for(int i = index; i < virus.size(); i++){
+        pick.push_back(virus[i]);
+        dfs_pick(i + 1);
+        pick.pop_back();
+    }
+}
+
+int main(){
+    scanf("%d %d", &n, &m);
+    for(int y = 0; y < n; y++){
+        for(int x = 0; x < n; x++){
+            scanf("%d", &map[y][x]);
+            if(map[y][x] == 2){
+                virus.push_back({y, x});
+            }
+            else if(map[y][x] == 0){
+                cnt_empty++;
+            }
+        }
+    }
+    
+    dfs_pick(0);
+    
+    if(ret == 9999) printf("-1\n");
+    else printf("%d\n", ret);
+}
